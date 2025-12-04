@@ -122,7 +122,7 @@ export default function AdminPage() {
                       {ngo.pubkey}
                     </div>
                     <div className="flex justify-between text-[11px] text-gray-600">
-                      <span>Admin: {admin}</span>
+                      <span>Admin: {String(admin)}</span>
                         <span
                             className={
                             ngo.account.isActive
