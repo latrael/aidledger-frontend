@@ -19,6 +19,11 @@ const patchedIdl: any = {
     .map((acc: any) => ({ ...acc, size: acc.size ?? 0 })),
 };
 
+const connection = new Connection(process.env.ANCHOR_PROVIDER_URL || clusterApiUrl("devnet"));
+const wallet = new anchor.Wallet(Keypair.generate()); // dummy
+const provider = new anchor.AnchorProvider(connection, wallet, anchor.AnchorProvider.defaultOptions());
+
+
 export function getProvider() {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
