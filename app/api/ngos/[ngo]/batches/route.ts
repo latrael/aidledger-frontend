@@ -4,16 +4,9 @@
 import { NextResponse } from "next/server";
 import { listBatchesForNgoBase58 } from "@/lib/aidledgerClient";
 
-interface Params {
-  ngo: string;
-}
-
-export async function GET(
-  _req: Request,
-  { params }: { params: Params },
-) {
+export async function GET(req: any, context: any) {
   try {
-    const ngoBase58 = params.ngo; // string from the URL
+    const ngoBase58 = context?.params?.ngo as string;
 
     const batches = await listBatchesForNgoBase58(ngoBase58);
 
@@ -28,7 +21,7 @@ export async function GET(
       account: {
         ngo: b.account.ngo.toBase58(),
         batchIndex: Number(b.account.batchIndex),
-        merkleRoot: b.account.merkleRoot, // already plain bytes[]
+        merkleRoot: b.account.merkleRoot,
         dataUri: b.account.dataUri,
         region: b.account.region,
         programTag: b.account.programTag,
