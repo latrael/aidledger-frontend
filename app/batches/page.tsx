@@ -12,6 +12,25 @@ interface ApiResult {
   error?: string;
 }
 
+import { useEffect } from "react";
+
+interface WalletInfo {
+  name: string;
+  path: string;
+  publicKey: string;
+  exists: boolean;
+}
+
+interface NgoInfo {
+  pubkey: string;
+  account: {
+    admin: string;
+    metadataUri: string;
+    isActive: boolean;
+    createdAt: number;
+  };
+}
+
 export default function BatchesPage() {
   const [batchIndex, setBatchIndex] = useState(0);
   const [dataUri, setDataUri] = useState("ipfs://aidledger-demo-batch");
@@ -28,6 +47,45 @@ export default function BatchesPage() {
   const [r1Amount, setR1Amount] = useState<number | "">("");
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  
+  // Wallet and NGO selection
+  const [wallets, setWallets] = useState<WalletInfo[]>([]);
+  const [ngos, setNgos] = useState<NgoInfo[]>([]);
+  const [selectedWallet, setSelectedWallet] = useState<string>("");
+  const [selectedNgo, setSelectedNgo] = useState<string>("");
+
+  // Load wallets and NGOs
+  useEffect(() => {
+    const loadWalletsAndNgos = async () => {
+      try {
+        // Load wallets
+        const walletsRes = await fetch("/api/wallet");
+        const walletsData = await walletsRes.json();
+        if (walletsData.ok) {
+          setWallets(walletsData.wallets);
+        }
+
+        // Load NGOs
+        const ngosRes = await fetch("/api/ngos");
+        const ngosData = await ngosRes.json();
+        if (ngosData.ok) {
+          setNgos(ngosData.ngos);
+        }
+      } catch (error) {
+        console.error("Failed to load wallets/NGOs:", error);
+      }
+    };
+
+    loadWalletsAndNgos();
+  }, []);
+
+  // Filter NGOs for selected wallet
+  const availableNgos = selectedWallet 
+    ? ngos.filter(ngo => {
+        const wallet = wallets.find(w => w.name === selectedWallet);
+        return wallet && ngo.account.admin === wallet.publicKey;
+      })
+    : [];
 
 
     const handlePinBatchData = async () => {
@@ -115,6 +173,12 @@ export default function BatchesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!selectedWallet || !selectedNgo) {
+      setResult({ ok: false, error: "Please select a wallet and NGO" });
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     try {
@@ -126,6 +190,8 @@ export default function BatchesPage() {
           dataUri,
           region,
           programTag,
+          walletName: selectedWallet,
+          ngoPda: selectedNgo,
         }),
       });
       const data = await res.json();
@@ -169,6 +235,51 @@ export default function BatchesPage() {
       </section>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Wallet and NGO Selection */}
+        <div className="grid grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+          <div>
+            <label className="block text-sm font-medium mb-2">Select Wallet</label>
+            <select
+              value={selectedWallet}
+              onChange={(e) => {
+                setSelectedWallet(e.target.value);
+                setSelectedNgo(""); // Reset NGO selection when wallet changes
+              }}
+              className="w-full px-3 py-2 border rounded-md"
+            >
+              <option value="">Choose a wallet...</option>
+              {wallets.map((wallet) => (
+                <option key={wallet.name} value={wallet.name}>
+                  {wallet.name} ({wallet.publicKey.slice(0, 8)}...)
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-2">Select NGO</label>
+            <select
+              value={selectedNgo}
+              onChange={(e) => setSelectedNgo(e.target.value)}
+              disabled={!selectedWallet}
+              className="w-full px-3 py-2 border rounded-md disabled:bg-gray-100"
+            >
+              <option value="">Choose an NGO...</option>
+              {availableNgos.map((ngo) => (
+                <option key={ngo.pubkey} value={ngo.pubkey}>
+                  {ngo.account.metadataUri.replace('ipfs://', '').slice(0, 20)}... 
+                  ({ngo.pubkey.slice(0, 8)}...)
+                </option>
+              ))}
+            </select>
+            {selectedWallet && availableNgos.length === 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                No NGOs found for this wallet. <a href="/wallet" className="text-blue-600 underline">Create one first</a>.
+              </p>
+            )}
+          </div>
+        </div>
+
         {/* Top row: batch index + program */}
         <div className="grid grid-cols-2 gap-4">
           <div>
