@@ -60,6 +60,9 @@ export async function POST(req: Request) {
       );
     }
 
+    // Initialize Solana connection
+    const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+
     // Use CLI approach for NGO registration to avoid Anchor Program issues
     try {
       const { WalletManager } = await import('@/lib/walletManager');

@@ -10,6 +10,30 @@
 
 > **Note**: This is the **web application frontend**. For the smart contract backend, see [aidledger-dev](../aidledger-dev).
 
+## 📑 Table of Contents
+
+- [🌟 Features Overview](#-features-overview)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [🏗️ Application Architecture](#️-application-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [🗺️ Application Routes & Workflow](#️-application-routes--workflow)
+  - [🏠 Landing Page (/)](#-landing-page-)
+  - [💼 Wallet Manager (/wallet)](#-wallet-manager-wallet)
+  - [🏢 NGO Directory (/ngo)](#-ngo-directory-ngo)
+  - [📦 Batch Management (/batches)](#-batch-management-batches)
+  - [👨‍💼 Admin Dashboard (/admin)](#-admin-dashboard-admin)
+- [🔧 API Routes Documentation](#-api-routes-documentation)
+- [🧪 Testing the Complete Workflow](#-testing-the-complete-workflow)
+- [🔒 Security & Best Practices](#-security--best-practices)
+- [🚀 Deployment](#-deployment)
+- [🛠️ Development Tools](#️-development-tools)
+- [🤝 Integration Points](#-integration-points)
+- [📊 Performance Metrics](#-performance-metrics)
+- [🛣️ Roadmap](#️-roadmap)
+- [📄 License](#-license)
+- [🤝 Contributing](#-contributing)
+- [📞 Support & Resources](#-support--resources)
+
 ## 🌟 Features Overview
 
 ### 🏠 **Dashboard & Analytics**
